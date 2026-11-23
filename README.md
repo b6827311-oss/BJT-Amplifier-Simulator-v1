@@ -292,7 +292,8 @@ Q1 vc vb ve QNPN
 - **Repository:** <https://github.com/b6827311-oss/BJT-Amplifier-Simulator-v1>
 - **Branch:** `main`
 - **Lab 03 commit:** `ecf69a4` (*Initial commit*, seed)
-- **Lab 04 commit SHA:** _รอเพิ่มหลังกด Commit/Push ใน GitHub Desktop_
+- **Lab 04 commit SHA:** `46bc3d3f27a5bcc6148f97486d77999d1a6e90e8` (`46bc3d3` —
+  *feat: add Lab 04 ngspice CE amplifier simulator with B1-B8 evidence and fresh-PC setup*)
 - **วิธีรัน:** `.\setup.cmd` → `.\run.cmd` → <http://127.0.0.1:5000/simulator>
 
 **AI ช่วยทำอะไร:** เขียน `spice_engine.py`/`plots.py`, route `/simulator`–`/simulate`,
