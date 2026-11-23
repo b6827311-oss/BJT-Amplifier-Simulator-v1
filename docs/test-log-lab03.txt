@@ -1,0 +1,29 @@
+﻿.\.venv\Scripts\python.exe : test_active_region_has_no_warning 
+(test_dc_bias.TestDCBias.test_active_region_has_no_warning) ... ok
+At line:1 char:27
++ ... s_Web_App"; .\.venv\Scripts\python.exe -m unittest discover -s tests  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_active_reg...warning) ... ok:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+test_cutoff_warning (test_dc_bias.TestDCBias.test_cutoff_warning) ... ok
+test_reference_operating_point (test_dc_bias.TestDCBias.test_reference_operating_point) ... ok
+test_rejects_non_finite_input (test_dc_bias.TestDCBias.test_rejects_non_finite_input) ... ok
+test_rejects_non_positive_vbe (test_dc_bias.TestDCBias.test_rejects_non_positive_vbe) ... ok
+test_rejects_overflowing_input (test_dc_bias.TestDCBias.test_rejects_overflowing_input) ... ok
+test_rejects_zero_beta (test_dc_bias.TestDCBias.test_rejects_zero_beta) ... ok
+test_rejects_zero_resistor (test_dc_bias.TestDCBias.test_rejects_zero_resistor) ... ok
+test_rejects_zero_vcc (test_dc_bias.TestDCBias.test_rejects_zero_vcc) ... ok
+test_saturation_warning (test_dc_bias.TestDCBias.test_saturation_warning) ... ok
+test_get_form (test_web.TestWeb.test_get_form) ... ok
+test_post_cutoff_warning (test_web.TestWeb.test_post_cutoff_warning) ... ok
+test_post_invalid_resistor (test_web.TestWeb.test_post_invalid_resistor) ... ok
+test_post_missing_field (test_web.TestWeb.test_post_missing_field) ... ok
+test_post_nan_rejected (test_web.TestWeb.test_post_nan_rejected) ... ok
+test_post_saturation_warning (test_web.TestWeb.test_post_saturation_warning) ... ok
+test_post_valid (test_web.TestWeb.test_post_valid) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.063s
+
+OK

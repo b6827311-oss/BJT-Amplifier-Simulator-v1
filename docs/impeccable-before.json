@@ -1,0 +1,76 @@
+﻿impeccable.cmd : impeccable detect: could not read linked stylesheet {{ url_for('static', filename='style.css') }} 
+(resolved to C:\Users\advic\Projects\BJT-Amplifier-Simulator-v1\templates\{{ url_for('static', filename='style.css') 
+}}); color and custom-property rules will be incomplete
+At line:1 char:1
++ & ".opencode\skills\impeccable\scripts\impeccable.cmd" detect --json  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (impeccable dete...l be incomplete:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+impeccable detect: could not read linked stylesheet {{ url_for('static', filename='style.css') }} (resolved to 
+C:\Users\advic\Projects\BJT-Amplifier-Simulator-v1\templates\{{ url_for('static', filename='style.css') }}); color and 
+custom-property rules will be incomplete
+[
+  {
+    "antipattern": "flat-type-hierarchy",
+    "name": "Flat type hierarchy",
+    "description": "Dominant heading and body roles are separated by less than 1.25ร— at every step, leaving the size hierarchy flat. Add at least one stronger size step.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\advic\\Projects\\BJT-Amplifier-Simulator-v1\\templates\\simulator.html",
+    "line": 0,
+    "snippet": "Role sizes: body 16px, h1 16px, h2 16px, h3 16px (largest adjacent step 1.00:1; target 1.25:1)"
+  },
+  {
+    "antipattern": "em-dash-overuse",
+    "name": "Em-dash overuse",
+    "description": "Em-dash saturation in body copy is an AI cadence tell. Advisory only: humans use em-dashes legitimately, so this fires only on saturation โ€” at least 8 em-dashes (โ€” or --) at a density near one per 500 characters of body text โ€” never on a long article that uses a few. Prefer commas, colons, periods, or parentheses.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "C:\\Users\\advic\\Projects\\BJT-Amplifier-Simulator-v1\\templates\\simulator.html",
+    "line": 0,
+    "snippet": "18 em-dashes in body text",
+    "advisory": true
+  },
+  {
+    "antipattern": "flat-type-hierarchy",
+    "name": "Flat type hierarchy",
+    "description": "Dominant heading and body roles are separated by less than 1.25ร— at every step, leaving the size hierarchy flat. Add at least one stronger size step.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\advic\\Projects\\BJT-Amplifier-Simulator-v1\\templates\\index.html",
+    "line": 0,
+    "snippet": "Role sizes: body 16px, h1 16px, h2 16px (largest adjacent step 1.00:1; target 1.25:1)"
+  },
+  {
+    "antipattern": "em-dash-overuse",
+    "name": "Em-dash overuse",
+    "description": "Em-dash saturation in body copy is an AI cadence tell. Advisory only: humans use em-dashes legitimately, so this fires only on saturation โ€” at least 8 em-dashes (โ€” or --) at a density near one per 500 characters of body text โ€” never on a long article that uses a few. Prefer commas, colons, periods, or parentheses.",
+    "severity": "advisory",
+    "category": "slop",
+    "file": "C:\\Users\\advic\\Projects\\BJT-Amplifier-Simulator-v1\\templates\\index.html",
+    "line": 0,
+    "snippet": "22 em-dashes in body text",
+    "advisory": true
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "A bar down one side of a rounded box. Use a full border, a background tint, or a leading icon or label instead.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\advic\\Projects\\BJT-Amplifier-Simulator-v1\\static\\style.css",
+    "line": 298,
+    "snippet": "border-left: 3px solid var(--teal)"
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "A bar down one side of a rounded box. Use a full border, a background tint, or a leading icon or label instead.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\advic\\Projects\\BJT-Amplifier-Simulator-v1\\static\\style.css",
+    "line": 1213,
+    "snippet": "border-left: 3px solid var(--teal)"
+  }
+]

@@ -1,0 +1,67 @@
+﻿python.exe : test_engine_error_is_visible_before_any_run 
+(test_app_simulator.TestSimulatorRoutes.test_engine_error_is_visible_before_any_run) ... ok
+At line:9 char:1
++ & .\.venv\Scripts\python.exe -m unittest discover -s tests -v 2>&1 |  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_engine_err...any_run) ... ok:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+test_engine_failure_shows_error_without_fake_success 
+(test_app_simulator.TestSimulatorRoutes.test_engine_failure_shows_error_without_fake_success) ... ok
+test_get_simulator_has_expected_controls_and_no_results 
+(test_app_simulator.TestSimulatorRoutes.test_get_simulator_has_expected_controls_and_no_results) ... ok
+test_invalid_re_shows_error_without_stale_results 
+(test_app_simulator.TestSimulatorRoutes.test_invalid_re_shows_error_without_stale_results) ... ok
+test_post_converts_form_units_once (test_app_simulator.TestSimulatorRoutes.test_post_converts_form_units_once) ... ok
+test_active_region_has_no_warning (test_dc_bias.TestDCBias.test_active_region_has_no_warning) ... ok
+test_cutoff_warning (test_dc_bias.TestDCBias.test_cutoff_warning) ... ok
+test_reference_operating_point (test_dc_bias.TestDCBias.test_reference_operating_point) ... ok
+test_rejects_non_finite_input (test_dc_bias.TestDCBias.test_rejects_non_finite_input) ... ok
+test_rejects_non_positive_vbe (test_dc_bias.TestDCBias.test_rejects_non_positive_vbe) ... ok
+test_rejects_overflowing_input (test_dc_bias.TestDCBias.test_rejects_overflowing_input) ... ok
+test_rejects_zero_beta (test_dc_bias.TestDCBias.test_rejects_zero_beta) ... ok
+test_rejects_zero_resistor (test_dc_bias.TestDCBias.test_rejects_zero_resistor) ... ok
+test_rejects_zero_vcc (test_dc_bias.TestDCBias.test_rejects_zero_vcc) ... ok
+test_saturation_warning (test_dc_bias.TestDCBias.test_saturation_warning) ... ok
+test_bode_charts_have_units_and_real_data_points 
+(test_plots.TestCharts.test_bode_charts_have_units_and_real_data_points) ... ok
+test_empty_data_returns_empty_chart (test_plots.TestCharts.test_empty_data_returns_empty_chart) ... ok
+test_transient_chart_uses_millivolts_on_both_axes 
+(test_plots.TestCharts.test_transient_chart_uses_millivolts_on_both_axes) ... ok
+test_si_prefixes (test_plots.TestFormatFreq.test_si_prefixes) ... ok
+test_sub_hertz_uses_plain_hz (test_plots.TestFormatFreq.test_sub_hertz_uses_plain_hz) ... ok
+test_build_netlist_ac_sweep_and_tran_window 
+(test_spice_engine.TestNetlist.test_build_netlist_ac_sweep_and_tran_window) ... ok
+test_build_netlist_dc_contains_embedded_model_and_saved_currents 
+(test_spice_engine.TestNetlist.test_build_netlist_dc_contains_embedded_model_and_saved_currents) ... ok
+test_spice_number (test_spice_engine.TestNetlist.test_spice_number) ... ok
+test_transient_timing_is_clamped (test_spice_engine.TestNetlist.test_transient_timing_is_clamped) ... ok
+test_unknown_analysis_rejected (test_spice_engine.TestNetlist.test_unknown_analysis_rejected) ... ok
+test_empty_raw_rejected (test_spice_engine.TestRawParsing.test_empty_raw_rejected) ... ok
+test_parse_raw_reads_complex_values_without_blank_line 
+(test_spice_engine.TestRawParsing.test_parse_raw_reads_complex_values_without_blank_line) ... ok
+test_series_missing_variable_raises (test_spice_engine.TestRawParsing.test_series_missing_variable_raises) ... ok
+test_analytical_estimate_is_separate_from_spice_result 
+(test_spice_engine.TestSummaries.test_analytical_estimate_is_separate_from_spice_result) ... ok
+test_dc_region_boundaries (test_spice_engine.TestSummaries.test_dc_region_boundaries) ... ok
+test_summarize_ac_anchors_phase_and_finds_corners 
+(test_spice_engine.TestSummaries.test_summarize_ac_anchors_phase_and_finds_corners) ... ok
+test_summarize_dc (test_spice_engine.TestSummaries.test_summarize_dc) ... ok
+test_summarize_tran_measures_inverted_gain 
+(test_spice_engine.TestSummaries.test_summarize_tran_measures_inverted_gain) ... ok
+test_normalize_params_copies_and_accepts_base 
+(test_spice_engine.TestValidation.test_normalize_params_copies_and_accepts_base) ... ok
+test_normalize_params_rejects_bad_values (test_spice_engine.TestValidation.test_normalize_params_rejects_bad_values) 
+... ok
+test_get_form (test_web.TestWeb.test_get_form) ... ok
+test_post_cutoff_warning (test_web.TestWeb.test_post_cutoff_warning) ... ok
+test_post_invalid_resistor (test_web.TestWeb.test_post_invalid_resistor) ... ok
+test_post_missing_field (test_web.TestWeb.test_post_missing_field) ... ok
+test_post_nan_rejected (test_web.TestWeb.test_post_nan_rejected) ... ok
+test_post_saturation_warning (test_web.TestWeb.test_post_saturation_warning) ... ok
+test_post_valid (test_web.TestWeb.test_post_valid) ... ok
+
+----------------------------------------------------------------------
+Ran 42 tests in 0.112s
+
+OK

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 03: BJT Bias Web App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">ENG29 2121 · Computer Programming for Electrical Engineers</p>
+        <h1>Lab 03: BJT Bias Web App</h1>
+        <p class="subtitle">Common-Emitter · Voltage Divider / Fixed / Emitter Bias · NPN · Forward-Active Approximation</p>
+      </div>
+      <span class="week-badge">Week 3 · DC only</span>
+    </header>
+
+    <nav class="tabs" aria-label="เลือกหน้าคำนวน">
+      <a class="tab tab--active" href="{{ url_for('index') }}" aria-current="page">
+        Analytical DC Bias <small>Lab 03 · dc_bias.py</small>
+      </a>
+      <a class="tab" href="{{ url_for('simulator') }}">
+        SPICE Amplifier <small>Lab 04 · ngspice</small>
+      </a>
+    </nav>
+
+    {% if error %}
+      <div class="alert alert--error" role="alert">
+        <span class="alert__icon" aria-hidden="true">!</span>
+        <span>{{ error }}</span>
+      </div>
+    {% endif %}
+
+    <div class="layout">
+      <section class="card card--input" aria-labelledby="input-title">
+        <h2 class="card__title" id="input-title">Input Parameters</h2>
+        <form class="form" method="post" action="{{ url_for('calculate') }}">
+          <div class="field">
+            <label class="field__label" for="mode">โหมดวงจร <small>Circuit Mode</small></label>
+            <select class="select" id="mode" name="mode">
+              {% for value, label in modes %}
+                <option value="{{ value }}"{% if value == mode %} selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          {% if mode_note %}
+            <p class="mode-note">{{ mode_note }}</p>
+          {% endif %}
+
+          {% for field in fields %}
+            <div class="field">
+              <label class="field__label" for="{{ field.name }}">{{ field.label }} <small>{{ field.hint }}</small></label>
+              <input id="{{ field.name }}" name="{{ field.name }}" type="number"
+                     value="{{ field.value }}" inputmode="decimal" step="any" required>
+            </div>
+          {% endfor %}
+
+          {% if mode in ("fixed", "emitter") %}
+            <p class="mode-hint">RB รับหน่วย kΩ: 1 MΩ = 1000 kΩ</p>
+          {% endif %}
+
+          {% if mode %}
+            <button class="button" type="submit">Calculate DC Bias</button>
+            <button class="button button--ghost" type="submit"
+                    formmethod="get" formaction="{{ url_for('index') }}">เปลี่ยนโหมด / โหลดฟอร์มใหม่</button>
+          {% else %}
+            <button class="button button--ghost" type="submit"
+                    formmethod="get" formaction="{{ url_for('index') }}">โหลดฟอร์มใหม่</button>
+          {% endif %}
+        </form>
+      </section>
+
+      <section class="card card--circuit" aria-labelledby="circuit-title">
+        <h2 class="card__title" id="circuit-title">Circuit</h2>
+        <div class="circuit">
+          {% if mode == "fixed" %}
+            <svg class="circuit__svg" viewBox="0 0 440 520" role="img"
+                 aria-labelledby="circuit-desc">
+              <title id="circuit-desc">BJT NPN fixed bias circuit</title>
+
+              <!-- VCC rail -->
+              <path class="wire" d="M180 70 H300"/>
+              <path class="wire" d="M240 70 V48"/>
+              <circle class="node" cx="240" cy="48" r="3.5"/>
+              <text class="val" x="252" y="52">VCC = {{ values.vcc or "—" }} V</text>
+
+              <!-- RB -->
+              <rect class="comp" x="170" y="86" width="20" height="76" rx="4"/>
+              <path class="wire" d="M180 70 V86 M180 162 V220"/>
+              <text class="lbl" x="160" y="118" text-anchor="end">RB</text>
+              <text class="val" x="160" y="136" text-anchor="end">{{ values.rb or "—" }} kΩ</text>
+
+              <!-- Base node and lead -->
+              <circle class="node" cx="180" cy="220" r="3.5"/>
+              <path class="wire" d="M180 220 H266"/>
+
+              <!-- RC -->
+              <rect class="comp" x="290" y="86" width="20" height="76" rx="4"/>
+              <path class="wire" d="M300 70 V86 M300 162 V190"/>
+              <text class="lbl" x="322" y="118">RC</text>
+              <text class="val" x="322" y="136">{{ values.rc or "—" }} kΩ</text>
+
+              <!-- Q1 NPN -->
+              <path class="base-bar" d="M266 196 V244"/>
+              <path class="wire" d="M300 190 L266 208"/>
+              <path class="wire" d="M266 232 L300 250"/>
+              <polygon class="comp comp--filled" points="300,250 289.9,239.0 285.3,247.8"/>
+              <text class="lbl" x="252" y="278" text-anchor="end">Q1</text>
+              <text class="glabel" x="252" y="294" text-anchor="end">NPN</text>
+              <text class="val" x="232" y="200" text-anchor="end">β = {{ values.beta or "—" }}</text>
+
+              <!-- Fixed bias: emitter tied straight to ground -->
+              <path class="wire" d="M300 250 V470"/>
+
+              <!-- Ground -->
+              <path class="wire" d="M180 470 H300"/>
+              <path class="wire" d="M240 470 V486"/>
+              <path class="wire" d="M222 486 H258 M228 493 H252 M234 500 H246"/>
+              <text class="glabel" x="268" y="496">GND</text>
+            </svg>
+            <p class="card__hint">Fixed bias · VE = 0 V · Emitter ต่อลงกราวด์โดยตรง</p>
+          {% elif mode == "emitter" %}
+            <svg class="circuit__svg" viewBox="0 0 440 520" role="img"
+                 aria-labelledby="circuit-desc">
+              <title id="circuit-desc">BJT NPN emitter bias circuit</title>
+
+              <!-- VCC rail -->
+              <path class="wire" d="M180 70 H300"/>
+              <path class="wire" d="M240 70 V48"/>
+              <circle class="node" cx="240" cy="48" r="3.5"/>
+              <text class="val" x="252" y="52">VCC = {{ values.vcc or "—" }} V</text>
+
+              <!-- RB -->
+              <rect class="comp" x="170" y="86" width="20" height="76" rx="4"/>
+              <path class="wire" d="M180 70 V86 M180 162 V220"/>
+              <text class="lbl" x="160" y="118" text-anchor="end">RB</text>
+              <text class="val" x="160" y="136" text-anchor="end">{{ values.rb or "—" }} kΩ</text>
+
+              <!-- Base node and lead -->
+              <circle class="node" cx="180" cy="220" r="3.5"/>
+              <path class="wire" d="M180 220 H266"/>
+
+              <!-- RC -->
+              <rect class="comp" x="290" y="86" width="20" height="76" rx="4"/>
+              <path class="wire" d="M300 70 V86 M300 162 V190"/>
+              <text class="lbl" x="322" y="118">RC</text>
+              <text class="val" x="322" y="136">{{ values.rc or "—" }} kΩ</text>
+
+              <!-- Q1 NPN -->
+              <path class="base-bar" d="M266 196 V244"/>
+              <path class="wire" d="M300 190 L266 208"/>
+              <path class="wire" d="M266 232 L300 250"/>
+              <polygon class="comp comp--filled" points="300,250 289.9,239.0 285.3,247.8"/>
+              <text class="lbl" x="252" y="278" text-anchor="end">Q1</text>
+              <text class="glabel" x="252" y="294" text-anchor="end">NPN</text>
+              <text class="val" x="232" y="200" text-anchor="end">β = {{ values.beta or "—" }}</text>
+
+              <!-- RE -->
+              <path class="wire" d="M300 250 V300"/>
+              <rect class="comp" x="290" y="300" width="20" height="76" rx="4"/>
+              <path class="wire" d="M300 376 V470"/>
+              <text class="lbl" x="322" y="332">RE</text>
+              <text class="val" x="322" y="350">{{ values.re or "—" }} kΩ</text>
+
+              <!-- Ground -->
+              <path class="wire" d="M180 470 H300"/>
+              <path class="wire" d="M240 470 V486"/>
+              <path class="wire" d="M222 486 H258 M228 493 H252 M234 500 H246"/>
+              <text class="glabel" x="268" y="496">GND</text>
+            </svg>
+            <p class="card__hint">Emitter bias · RB + RE · VE = IE · RE</p>
+          {% else %}
+            <svg class="circuit__svg" viewBox="0 0 440 520" role="img"
+                 aria-labelledby="circuit-desc">
+              <title id="circuit-desc">BJT NPN common-emitter voltage-divider bias circuit</title>
+
+              <!-- VCC rail -->
+              <path class="wire" d="M120 70 H300"/>
+              <path class="wire" d="M210 70 V48"/>
+              <circle class="node" cx="210" cy="48" r="3.5"/>
+              <text class="val" x="222" y="52">VCC = {{ values.vcc or "—" }} V</text>
+
+              <!-- R1 -->
+              <rect class="comp" x="110" y="86" width="20" height="76" rx="4"/>
+              <path class="wire" d="M120 70 V86 M120 162 V220"/>
+              <text class="lbl" x="100" y="118" text-anchor="end">R1</text>
+              <text class="val" x="100" y="136" text-anchor="end">{{ values.r1 or "—" }} kΩ</text>
+
+              <!-- Base node and lead -->
+              <circle class="node" cx="120" cy="220" r="3.5"/>
+              <path class="wire" d="M120 220 H266"/>
+
+              <!-- R2 -->
+              <rect class="comp" x="110" y="260" width="20" height="76" rx="4"/>
+              <path class="wire" d="M120 220 V260 M120 336 V470"/>
+              <text class="lbl" x="100" y="292" text-anchor="end">R2</text>
+              <text class="val" x="100" y="310" text-anchor="end">{{ values.r2 or "—" }} kΩ</text>
+
+              <!-- RC -->
+              <rect class="comp" x="290" y="86" width="20" height="76" rx="4"/>
+              <path class="wire" d="M300 70 V86 M300 162 V190"/>
+              <text class="lbl" x="322" y="118">RC</text>
+              <text class="val" x="322" y="136">{{ values.rc or "—" }} kΩ</text>
+
+              <!-- Q1 NPN -->
+              <path class="base-bar" d="M266 196 V244"/>
+              <path class="wire" d="M300 190 L266 208"/>
+              <path class="wire" d="M266 232 L300 250"/>
+              <polygon class="comp comp--filled" points="300,250 289.9,239.0 285.3,247.8"/>
+              <text class="lbl" x="252" y="278" text-anchor="end">Q1</text>
+              <text class="glabel" x="252" y="294" text-anchor="end">NPN</text>
+              <text class="val" x="232" y="200" text-anchor="end">β = {{ values.beta or "—" }}</text>
+
+              <!-- RE -->
+              <path class="wire" d="M300 250 V300"/>
+              <rect class="comp" x="290" y="300" width="20" height="76" rx="4"/>
+              <path class="wire" d="M300 376 V470"/>
+              <text class="lbl" x="322" y="332">RE</text>
+              <text class="val" x="322" y="350">{{ values.re or "—" }} kΩ</text>
+
+              <!-- Ground -->
+              <path class="wire" d="M120 470 H300"/>
+              <path class="wire" d="M210 470 V486"/>
+              <path class="wire" d="M192 486 H228 M198 493 H222 M204 500 H216"/>
+              <text class="glabel" x="238" y="496">GND</text>
+            </svg>
+            <p class="card__hint">Voltage-divider bias · ค่าที่แสดงตรงกับช่องกรอก</p>
+          {% endif %}
+
+          {% if result %}
+            <div class="node-chips" aria-label="Node voltages">
+              <div class="node-chip">
+                <span class="node-chip__k">VB</span>
+                <span class="node-chip__v">{{ "%.2f"|format(result.vb) }} V</span>
+              </div>
+              <div class="node-chip">
+                <span class="node-chip__k">VC</span>
+                <span class="node-chip__v">{{ "%.2f"|format(result.vc) }} V</span>
+              </div>
+              <div class="node-chip">
+                <span class="node-chip__k">VE</span>
+                <span class="node-chip__v">{{ "%.2f"|format(result.ve) }} V</span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="card card--results" aria-labelledby="results-title">
+        <h2 class="card__title" id="results-title">DC Bias Results</h2>
+
+        {% if result %}
+          {% set status_class = "status--active" if result.region == "active" else ("status--cutoff" if result.region == "cutoff" else "status--near") %}
+          {% if result.region == "active" %}
+            {% set status_text = "Active region approximation OK" %}
+          {% elif result.region == "cutoff" %}
+            {% set status_text = "Cutoff — forward-active approximation ใช้ไม่ได้" %}
+          {% else %}
+            {% set status_text = "Near Saturation — VCE ต่ำกว่า 0.2 V" %}
+          {% endif %}
+
+          <p class="result-mode">โหมดที่คำนวณ: <strong>{{ mode_label }}</strong></p>
+
+          <div class="results">
+            <table class="results__table">
+              <tbody>
+                <tr>
+                  <th scope="row">VB</th>
+                  <td>{{ "%.2f"|format(result.vb) }}<span class="unit">V</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">VE</th>
+                  <td>{{ "%.2f"|format(result.ve) }}<span class="unit">V</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">VC</th>
+                  <td>{{ "%.2f"|format(result.vc) }}<span class="unit">V</span></td>
+                </tr>
+                <tr class="is-key">
+                  <th scope="row">VCE</th>
+                  <td>{{ "%.2f"|format(result.vce) }}<span class="unit">V</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">IB</th>
+                  <td>{{ "%.1f"|format(result.ib * 1e6) }}<span class="unit">µA</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">IC</th>
+                  <td>{{ "%.2f"|format(result.ic * 1e3) }}<span class="unit">mA</span></td>
+                </tr>
+                <tr>
+                  <th scope="row">IE</th>
+                  <td>{{ "%.2f"|format(result.ie * 1e3) }}<span class="unit">mA</span></td>
+                </tr>
+              </tbody>
+            </table>
+
+            {% if result.mode == "divider" %}
+              <p class="model-note">
+                <strong>VTH</strong> = {{ "%.2f"|format(result.vth) }} V ·
+                <strong>RTH</strong> = {{ "%.2f"|format(result.rth / 1000) }} kΩ
+              </p>
+            {% else %}
+              <p class="model-note">
+                <strong>IB</strong> = ({{ values.vcc }} V − VBE) / {% if result.mode == "fixed" %}RB{% else %}RB + (β + 1)·RE{% endif %}
+              </p>
+            {% endif %}
+
+            <div class="status {{ status_class }}" role="status">
+              <span class="status__dot" aria-hidden="true"></span>
+              <span>
+                <strong>{{ status_text }}</strong>
+                {% if result.region == "active" %}
+                  <span class="status__detail">VCE = {{ "%.2f"|format(result.vce) }} V &gt; 0.2 V · transistor in active region</span>
+                {% elif result.region == "cutoff" and result.mode == "divider" %}
+                  <span class="status__detail">VTH = {{ "%.2f"|format(result.vth) }} V ≤ VBE = {{ "%.2f"|format(vbe) }} V · ใช้ forward-active ไม่ได้</span>
+                {% elif result.region == "cutoff" %}
+                  <span class="status__detail">IB = {{ "%.1f"|format(result.ib * 1e6) }} µA ≤ 0 · ใช้ forward-active ไม่ได้</span>
+                {% else %}
+                  <span class="status__detail">VCE = {{ "%.2f"|format(result.vce) }} V ≤ 0.2 V · นอก forward-active</span>
+                {% endif %}
+              </span>
+            </div>
+
+            {% if warning_messages %}
+              <ul class="warnings">
+                {% for msg in warning_messages %}
+                  <li class="warning" role="alert">{{ msg }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% elif error %}
+          <p class="placeholder">
+            ยังไม่มีผลลัพธ์สำหรับรอบนี้ — แก้ค่าตามข้อความแจ้งด้านบนแล้วกด
+            <strong>Calculate DC Bias</strong> อีกครั้ง
+          </p>
+        {% else %}
+          <p class="placeholder">
+            ยังไม่มีผลลัพธ์ — เลือกโหมด กรอกค่าด้านซ้ายแล้วกด <strong>Calculate DC Bias</strong>
+          </p>
+        {% endif %}
+      </section>
+    </div>
+
+    <footer class="footer">
+      <span>ENG29 2121 · Lab 03 · Week 3</span>
+      <span>Forward-Active approximation · Divider / Fixed / Emitter · ไม่ใช่ SPICE</span>
+    </footer>
+  </main>
+</body>
+</html>
