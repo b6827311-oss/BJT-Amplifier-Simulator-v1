@@ -297,6 +297,8 @@ Q1 vc vb ve QNPN
 - **Lab 03 commit:** `ecf69a4` (*Initial commit*, seed)
 - **Lab 04 commit SHA:** `46bc3d3f27a5bcc6148f97486d77999d1a6e90e8` (`46bc3d3` —
   *feat: add Lab 04 ngspice CE amplifier simulator with B1-B8 evidence and fresh-PC setup*)
+- **Commit หลักฐาน Playwright MCP + เอกสารส่งงาน:** `466ab192e0cedb02ddef4fb76dbcad25a99c3374`
+  (`466ab19` — *docs: add Playwright MCP B1-B8 evidence and submission package*)
 - **วิธีรัน:** `.\setup.cmd` → `.\run.cmd` → <http://127.0.0.1:5000/simulator>
 - **Browser acceptance:** B1–B8 ตรวจด้วย **Playwright MCP** (`@playwright/mcp` + Chrome)
   เมื่อ 2026-11-24 — ตารางค่าจริงอยู่ที่ [`docs/validation.md`](docs/validation.md) §1.1

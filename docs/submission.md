@@ -16,13 +16,14 @@
 | Repository | <https://github.com/b6827311-oss/BJT-Amplifier-Simulator-v1> |
 | Branch | `main` |
 | Lab 04 code commit | `46bc3d3f27a5bcc6148f97486d77999d1a6e90e8` (`46bc3d3`) |
-| HEAD ตอนรวบรวมเอกสาร | `8a8d5b71d50911262a02094a05c7feeac0f22def` (`8a8d5b7` — *docs: add Lab 04 commit SHA*) |
-| Commit หลักฐาน Playwright MCP | _(เติม SHA หลัง commit ผ่าน GitHub Desktop)_ |
+| **Commit หลักฐาน Playwright MCP + เอกสารส่งงาน** | **`466ab192e0cedb02ddef4fb76dbcad25a99c3374` (`466ab19`)** — *docs: add Playwright MCP B1-B8 evidence and submission package* |
+| สถานะ | commit + push แล้ว 2026-11-24 17:43 (origin/main = `466ab19`) |
 | วิธีรัน | `.\setup.cmd` → `.\run.cmd` → <http://127.0.0.1:5000/simulator> |
 
-> หมายเหตุ: repo นี้ต้อง commit/push ผ่าน **GitHub Desktop** ตาม `AGENTS.md`
-> ไฟล์หลักฐานใหม่ (`docs/screenshots/playwright/`, เอกสารนี้, `docs/validation.md` ที่อัปเดต)
-> ยังเป็น working tree — ต้องกด Commit/Push ก่อนส่ง แล้วเอา SHA ใหม่มาเติมในตาราง
+> **SHA ที่ใช้ส่ง:** `466ab19` (เต็ม `466ab192e0cedb02ddef4fb76dbcad25a99c3374`)
+> — เป็น commit ที่มีหลักฐาน B1–B8 จาก Playwright MCP, `docs/validation.md` §1.1,
+> `docs/submission.md` และภาพ 10 ใบอยู่ในนั้นครบ
+> ถ้ามี commit เอกสารเพิ่มหลังจากนี้ HEAD จะมากกว่านี้ แต่ SHA ที่อ้างหลักฐานยังใช้ค่านี้ได้
 
 ---
 
@@ -156,8 +157,8 @@ AI ปรับ CSS ตาม Impeccable, เก็บภาพ before/after แ
 ## 7. เช็กลิสต์ก่อนกดส่ง
 
 - [ ] เติมชื่อ-นามสกุล และรหัสนักศึกษา ในเอกสารนี้และ `docs/reflection.md`
-- [ ] รัน `.\.venv\Scripts\python.exe -m unittest discover -s tests -v` → `Ran 42 tests ... OK`
-- [ ] เปิด `http://127.0.0.1:5000/simulator` แล้วรัน `.op` / `.ac` / `.tran` อย่างละครั้ง
-- [ ] Commit + Push ผ่าน GitHub Desktop (ห้าม commit `.venv/`, session log, wheels)
-- [ ] เอา SHA ใหม่จาก GitHub Desktop มาเติมใน §1 และใน `README.md` §Submission
-- [ ] ตรวจว่า `docs/screenshots/playwright/` ถูก track (ภาพ PNG 10 ใบ)
+- [x] รัน `.\.venv\Scripts\python.exe -m unittest discover -s tests -v` → `Ran 42 tests ... OK`
+- [x] เปิด `http://127.0.0.1:5000/simulator` แล้วรัน `.op` / `.ac` / `.tran` อย่างละครั้ง
+- [x] Commit + Push ผ่าน GitHub Desktop (ห้าม commit `.venv/`, session log, wheels) → `466ab19`
+- [x] เอา SHA มาเติมใน §1 แล้ว (`466ab19`)
+- [x] ตรวจว่า `docs/screenshots/playwright/` ถูก track (ภาพ PNG 10 ใบ) — อยู่ใน commit `466ab19`
