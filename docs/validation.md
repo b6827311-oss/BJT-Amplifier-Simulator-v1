@@ -10,10 +10,12 @@
 - **BJT model ในทุก netlist:**
   `.model QNPN NPN (IS=1e-14 BF=100 VAF=100 CJE=8p CJC=4p TF=0.3n)`
   — small-signal NPN ทั่วไปเพื่อการเรียน ไม่ใช่รุ่นการค้า
-- **วิธีตรวจ browser:** เครื่องมือ **OpenCode `browse`** (ต่อกับ browser ของผู้ใช้)
-  และ in-app browser ของ OpenCode ใช้จริงในการรัน Flask ที่
-  `http://127.0.0.1:5000/` — **Playwright MCP ไม่พร้อมใช้งานใน session นี้**
-  จึงบันทึกตามเครื่องมือที่ใช้จริง ไม่ได้อ้างว่าเป็นผล Playwright MCP
+- **วิธีตรวจ browser:**
+  - **2026-11-24 — Playwright MCP** (`@playwright/mcp`, Chrome) ตรวจ B1–B8 ซ้ำทั้งชุด
+    ตามวิธี Navigate → Snapshot → Select/Fill → Click → Snapshot → Read Values →
+    Compare → Screenshot; ภาพและค่าที่อ่านได้อยู่ใน §1.1
+  - 2026-11-23 — OpenCode `browse` (ต่อกับ browser ของผู้ใช้) และ in-app browser
+    ใช้บันทึกตาราง B1–B8 ครั้งแรก ค่าที่อ่านได้ตรงกับรอบ Playwright MCP ทุกช่อง
 - **ชุดทดสอบ:** `python -m unittest discover -s tests -v` →
   `Ran 42 tests ... OK` (17 เดิม + 25 ใหม่) ดู `docs/test-log-lab04.txt`
 
@@ -45,18 +47,51 @@
 
 | Case | Method | Input | Expected / Reference | Observed (อ่านจริง) | Evidence | Status |
 |---|---|---|---|---|---|---|
-| **B1** Regression | browse + in-app browser: เปิด `/` เลือกโหมดแล้วกด Calculate ทีละโหมด | ชุดค่า Lab 03 (`VCC=12, RC=2.2k, β=100, VBE=0.70`; Divider `R1=100, R2=22, RE=1`; Fixed/Emitter `RB=1000`) | Divider `VCE=8.05 V, IC=1.23 mA`; Fixed `9.51 V, 1.13 mA`; Emitter `8.71 V, 1.03 mA` | Divider `VCE 8.05V / IC 1.23mA`; Fixed `9.51V / 1.13mA`; Emitter `8.71V / 1.03mA` — สลับโหมดได้ | browser snapshot 2026-11-23; [`docs/lab03-acceptance.md`](lab03-acceptance.md) A1–A3 | **PASS** |
-| **B2** DC SPICE | `/simulator` → **Run DC (.op)** อ่าน metric + engine/model + `Netlist & ngspice log (provenance)` | ค่าอ้างอิงด้านบน | แสดง `VB/VE/VC/VCE/IC` จาก ngspice พร้อม Model และ Run Status | `VCE 7.90V · IC 1.28mA · VB 1.95V · VE 1.29V · VC 9.19V · VBE 0.660V · IB 11.9µA · IE 1.29mA`; engine `ngspice-47 พร้อมใช้งาน`; `Run OK — DC Operating Point (.op) · 1 data points · 33 ms · raw 1 KB`; log แสดง `ASCII raw file ... run.raw` | [`b2-dc-re1.jpeg`](screenshots/browser/b2-dc-re1.jpeg), netlist/log ในหน้าเว็บ | **PASS** |
-| **B3** Change RE | เปลี่ยน `RE` เดียว 1 → 2 kΩ แล้ว Run DC ซ้ำ | `RE=2` (kΩ) | Operating point ต้องเปลี่ยน ไม่ใช่ค่าค้าง | `VCE 9.06V · IC 0.70mA · VB 2.05V · VE 1.40V · VC 10.47V · VBE 0.644V · IB 6.4µA · IE 0.70mA`; netlist เปลี่ยนเป็น `RE ve 0 2k` | [`b3-dc-re2.jpeg`](screenshots/browser/b3-dc-re2.jpeg) + บรรทัด netlist | **PASS** |
-| **B4** AC | **Run AC (.ac)** อ่าน metric, แกนกราฟ, netlist/log | ค่าเดิม; `.ac dec 20 0.1 500meg` | Bode magnitude/phase มีหน่วยและค่าจาก run จริง | 194 points, 79 KB; `MIDBAND 4.86dB (1.75×)`; `fL 1.83Hz`; `fH 153MHz`; `@1kHz 4.86dB / −179.9°`; peak ที่ ~10.6 kHz; grid `100mHz … 100MHz`, dB และ degree; netlist `.ac dec 20 100m 500meg` | [`b4-ac.jpeg`](screenshots/browser/b4-ac.jpeg), `svg.chart` 2 เส้น 194 จุด | **PASS** |
-| **B5** Transient | **Run Transient (.tran)** ที่ 10 mVpk / 1 kHz | `amp=10`, `freq=1000` | เห็น Vin/Vout ตามเวลา มีป้ายเวลา/แรงดัน และกลับเฟส | `VIN p-p 20.0mV · VOUT p-p 35.0mV · GAIN p-p 1.75× · กลับเฟส 180° (inverted)`; window `4.0–20.0 ms`; 4008 points, 839 KB; chart `Transient — Vin / Vout (mV) vs time (ms)` | [`b5-tran-10mv-1khz.jpeg`](screenshots/browser/b5-tran-10mv-1khz.jpeg) | **PASS** |
-| **B6** Change Source | เปลี่ยน amplitude/frequency แล้ว Run ซ้ำ | `amp=20`, `freq=2000` | waveform/แกนเวลา/ค่า p-p ต้องเปลี่ยน | `VIN p-p 40.0mV · VOUT p-p 70.0mV · GAIN p-p 1.75×`; window `2.0–10.0 ms`; time ticks `0,2,4,6,8,10 ms` (เดิม `0,5,10,15,20 ms`); source `20 mVpk · 2000 Hz` | [`b6-tran-20mv-2khz.jpeg`](screenshots/browser/b6-tran-20mv-2khz.jpeg) | **PASS** |
-| **B7** Invalid / Fail | กรอก `RE=0` แล้วกด Run DC; อีกกรณีใช้ unittest จำลอง engine error | `RE=0` | แจ้ง error, HTTP 200, ไม่ค้างผลเก่า/ไม่มี success ปลอม | `role="alert"` → **“RE ต้องมากกว่า 0”**; ไม่มี metric grid, ไม่มี chart, ไม่มี run-status; ค่าที่กรอกยังอยู่ในฟอร์ม; route test `test_engine_failure_shows_error_without_fake_success` ผ่าน | [`b7-invalid-re.jpeg`](screenshots/browser/b7-invalid-re.jpeg) + `tests/test_app_simulator.py` | **PASS** (engine-fail จริงแบบจำลองด้วย mock ใน unittest) |
-| **B8** UI | browse: emulate `1280×900` และ `390×844`, เปิด `/simulator`, Run AC, สลับโหมด Lab 03 | desktop + mobile | กราฟ/หน่วย/ปุ่มอ่านง่าย ไม่มีเนื้อหาสำคัญถูกตัด | Desktop `scrollWidth 1265 / innerWidth 1280`, ปุ่ม 3 ปุ่มกว้าง 278px; mobile `scrollWidth 390 / innerWidth 390`, ปุ่มกว้าง 320px; SVG chart scaled เหลือ 320px (viewBox เดิม 760px) ไม่ล้น; เปลี่ยนโหมด `fixed → emitter` บน mobile แสดง `#rb/#re` ถูกต้อง | [`b8-desktop.png`](screenshots/browser/b8-desktop.png), [`b8-mobile.png`](screenshots/browser/b8-mobile.png), [`b8-mobile-ac.png`](screenshots/browser/b8-mobile-ac.png), [`b8-mobile-mode.png`](screenshots/browser/b8-mobile-mode.png), [`b8-desktop-mode.png`](screenshots/browser/b8-desktop-mode.png) | **PASS** |
+| **B1** Regression | browse + in-app browser: เปิด `/` เลือกโหมดแล้วกด Calculate ทีละโหมด | ชุดค่า Lab 03 (`VCC=12, RC=2.2k, β=100, VBE=0.70`; Divider `R1=100, R2=22, RE=1`; Fixed/Emitter `RB=1000`) | Divider `VCE=8.05 V, IC=1.23 mA`; Fixed `9.51 V, 1.13 mA`; Emitter `8.71 V, 1.03 mA` | Divider `VCE 8.05V / IC 1.23mA`; Fixed `9.51V / 1.13mA`; Emitter `8.71V / 1.03mA` — สลับโหมดได้ | browser snapshot 2026-11-23; [`docs/lab03-acceptance.md`](lab03-acceptance.md) A1–A3; [`playwright/b1-regression-emitter.png`](screenshots/playwright/b1-regression-emitter.png) | **PASS** |
+| **B2** DC SPICE | `/simulator` → **Run DC (.op)** อ่าน metric + engine/model + `Netlist & ngspice log (provenance)` | ค่าอ้างอิงด้านบน | แสดง `VB/VE/VC/VCE/IC` จาก ngspice พร้อม Model และ Run Status | `VCE 7.90V · IC 1.28mA · VB 1.95V · VE 1.29V · VC 9.19V · VBE 0.660V · IB 11.9µA · IE 1.29mA`; engine `ngspice-47 พร้อมใช้งาน`; `Run OK — DC Operating Point (.op) · 1 data points · 33 ms · raw 1 KB`; log แสดง `ASCII raw file ... run.raw` | [`b2-dc-re1.jpeg`](screenshots/browser/b2-dc-re1.jpeg), netlist/log ในหน้าเว็บ, [`playwright/b2-dc-re1.png`](screenshots/playwright/b2-dc-re1.png) | **PASS** |
+| **B3** Change RE | เปลี่ยน `RE` เดียว 1 → 2 kΩ แล้ว Run DC ซ้ำ | `RE=2` (kΩ) | Operating point ต้องเปลี่ยน ไม่ใช่ค่าค้าง | `VCE 9.06V · IC 0.70mA · VB 2.05V · VE 1.40V · VC 10.47V · VBE 0.644V · IB 6.4µA · IE 0.70mA`; netlist เปลี่ยนเป็น `RE ve 0 2k` | [`b3-dc-re2.jpeg`](screenshots/browser/b3-dc-re2.jpeg) + บรรทัด netlist, [`playwright/b3-dc-re2.png`](screenshots/playwright/b3-dc-re2.png) | **PASS** |
+| **B4** AC | **Run AC (.ac)** อ่าน metric, แกนกราฟ, netlist/log | ค่าเดิม; `.ac dec 20 0.1 500meg` | Bode magnitude/phase มีหน่วยและค่าจาก run จริง | 194 points, 79 KB; `MIDBAND 4.86dB (1.75×)`; `fL 1.83Hz`; `fH 153MHz`; `@1kHz 4.86dB / −179.9°`; peak ที่ ~10.6 kHz; grid `100mHz … 100MHz`, dB และ degree; netlist `.ac dec 20 100m 500meg` | [`b4-ac.jpeg`](screenshots/browser/b4-ac.jpeg), `svg.chart` 2 เส้น 194 จุด, [`playwright/b4-ac.png`](screenshots/playwright/b4-ac.png) | **PASS** |
+| **B5** Transient | **Run Transient (.tran)** ที่ 10 mVpk / 1 kHz | `amp=10`, `freq=1000` | เห็น Vin/Vout ตามเวลา มีป้ายเวลา/แรงดัน และกลับเฟส | `VIN p-p 20.0mV · VOUT p-p 35.0mV · GAIN p-p 1.75× · กลับเฟส 180° (inverted)`; window `4.0–20.0 ms`; 4008 points, 839 KB; chart `Transient — Vin / Vout (mV) vs time (ms)` | [`b5-tran-10mv-1khz.jpeg`](screenshots/browser/b5-tran-10mv-1khz.jpeg), [`playwright/b5-tran-10mv-1khz.png`](screenshots/playwright/b5-tran-10mv-1khz.png) | **PASS** |
+| **B6** Change Source | เปลี่ยน amplitude/frequency แล้ว Run ซ้ำ | `amp=20`, `freq=2000` | waveform/แกนเวลา/ค่า p-p ต้องเปลี่ยน | `VIN p-p 40.0mV · VOUT p-p 70.0mV · GAIN p-p 1.75×`; window `2.0–10.0 ms`; time ticks `0,2,4,6,8,10 ms` (เดิม `0,5,10,15,20 ms`); source `20 mVpk · 2000 Hz` | [`b6-tran-20mv-2khz.jpeg`](screenshots/browser/b6-tran-20mv-2khz.jpeg), [`playwright/b6-tran-20mv-2khz.png`](screenshots/playwright/b6-tran-20mv-2khz.png) | **PASS** |
+| **B7** Invalid / Fail | กรอก `RE=0` แล้วกด Run DC; อีกกรณีใช้ unittest จำลอง engine error | `RE=0` | แจ้ง error, HTTP 200, ไม่ค้างผลเก่า/ไม่มี success ปลอม | `role="alert"` → **“RE ต้องมากกว่า 0”**; ไม่มี metric grid, ไม่มี chart, ไม่มี run-status; ค่าที่กรอกยังอยู่ในฟอร์ม; route test `test_engine_failure_shows_error_without_fake_success` ผ่าน | [`b7-invalid-re.jpeg`](screenshots/browser/b7-invalid-re.jpeg) + `tests/test_app_simulator.py`, [`playwright/b7-invalid-re.png`](screenshots/playwright/b7-invalid-re.png) | **PASS** (engine-fail จริงแบบจำลองด้วย mock ใน unittest) |
+| **B8** UI | browse (2026-11-23) / Playwright MCP `resize` (2026-11-24): `1280×900` และ `390×844`, เปิด `/simulator`, Run AC, สลับโหมด Lab 03 | desktop + mobile | กราฟ/หน่วย/ปุ่มอ่านง่าย ไม่มีเนื้อหาสำคัญถูกตัด | Desktop `scrollWidth 1265 / innerWidth 1280`, ปุ่ม 3 ปุ่มกว้าง 278px; mobile `scrollWidth 390 / innerWidth 390`, ปุ่มกว้าง 320px; SVG chart scaled เหลือ 320px (viewBox เดิม 760px) ไม่ล้น; เปลี่ยนโหมด `fixed → emitter` บน mobile แสดง `#rb/#re` ถูกต้อง — รอบ Playwright MCP วัดได้ `375 / 390`, ปุ่มและ chart 305px (ต่างเพราะ scrollbar/viewport) | [`b8-desktop.png`](screenshots/browser/b8-desktop.png), [`b8-mobile.png`](screenshots/browser/b8-mobile.png), [`b8-mobile-ac.png`](screenshots/browser/b8-mobile-ac.png), [`b8-mobile-mode.png`](screenshots/browser/b8-mobile-mode.png), [`b8-desktop-mode.png`](screenshots/browser/b8-desktop-mode.png); Playwright MCP: [`playwright/b8-desktop.png`](screenshots/playwright/b8-desktop.png), [`playwright/b8-mobile-ac.png`](screenshots/playwright/b8-mobile-ac.png), [`playwright/b8-mobile-mode.png`](screenshots/playwright/b8-mobile-mode.png) | **PASS** |
 
-> หมายเหตุ B1–B7 บันทึกจาก in-app browser ส่วน B8 บันทึกจาก `browse` ที่ต่อกับ browser จริงของผู้ใช้
-> ทั้งสองเป็น browser tool จริงที่รันได้ใน session นี้ และทุกค่าด้านบนมาจากหน้าเว็บ/ngspice log
-> ไม่ใช่ค่าที่เดาไว้ล่วงหน้า
+> หมายเหตุ: B1–B8 ด้านบนบันทึกครั้งแรก (2026-11-23) ด้วย in-app browser และ `browse`
+> แล้ว **ตรวจซ้ำทั้งชุดด้วย Playwright MCP เมื่อ 2026-11-24** — ผลตรงกันทุกช่อง
+> (ดู §1.1) ทุกค่ามาจากหน้าเว็บ/ngspice log ไม่ใช่ค่าที่เดาไว้ล่วงหน้า
+
+### 1.1 Playwright MCP run — 2026-11-24
+
+- **เครื่องมือ:** `@playwright/mcp` (Playwright MCP server) ขับ **Chrome** จริง
+  ผ่าน MCP tool ใน OpenCode — ไม่ใช่ in-app browser และไม่ใช่การรัน Playwright แบบ script
+- **ลำดับวิธีต่อเคส:** Navigate → Snapshot → Select/Fill → Click → Snapshot →
+  Read Values → Compare → Screenshot
+- **แอปที่รัน:** Flask `http://127.0.0.1:5000/` (engine `ngspice-47`,
+  `%LOCALAPPDATA%\ngspice\Spice64\bin\ngspice_con.exe`)
+- **ภาพหลักฐาน:** `docs/screenshots/playwright/` (10 ภาพ)
+- **ค่า config:** MCP server ประกาศไว้นอก repo (`opencode.json` ที่ workspace root)
+  เพื่อไม่ให้ไฟล์ tooling ปนกับงานส่ง
+
+| Case | Action ใน Playwright MCP | ค่าที่อ่านได้จริง | ภาพ |
+|---|---|---|---|
+| **B1** | `GET /` → Calculate (Divider) → select `fixed` → reload → Calculate → select `emitter` → reload → Calculate | Divider `VB 1.94 · VE 1.24 · VC 9.29 · VCE 8.05 V · IB 12.3 µA · IC 1.23 mA`; Fixed `VCE 9.51 V · IC 1.13 mA`; Emitter `VCE 8.71 V · IC 1.03 mA` — ตรงค่าอ้างอิง Lab 03 | [`b1-regression-emitter.png`](screenshots/playwright/b1-regression-emitter.png) |
+| **B2** | `/simulator` → click **Run DC** → snapshot `Simulation Results` | `VCE 7.90 V · IC 1.28 mA · VB 1.95 V · VE 1.29 V · VC 9.19 V · VBE 0.660 V · IB 11.9 µA · IE 1.29 mA`, region Forward-Active, `DC Operating Point (.op) · ngspice-47 · 1 pts` | [`b2-dc-re1.png`](screenshots/playwright/b2-dc-re1.png) |
+| **B3** | fill `RE=2` → click **Run DC** | `VCE 9.06 V · IC 0.70 mA · VB 2.05 V · VE 1.40 V · VC 10.47 V · VBE 0.644 V · IB 6.4 µA`; netlist ที่อ่านจาก `<pre>` มีบรรทัด `RE ve 0 2k` | [`b3-dc-re2.png`](screenshots/playwright/b3-dc-re2.png) |
+| **B4** | fill `RE=1` → click **Run AC** | `194 pts`; Midband `4.86 dB (1.75×)`; `fL 1.83 Hz`; `fH 153 MHz`; `@1 kHz 4.86 dB / −179.9°`; polyline ใน `svg.chart` มี **194 จุดทั้งกราฟ magnitude และ phase** | [`b4-ac.png`](screenshots/playwright/b4-ac.png) |
+| **B5** | click **Run Transient** (10 mVpk / 1 kHz) | `4008 pts`; `Vin 20.0 mV p-p · Vout 35.0 mV p-p · Gain 1.75× · กลับเฟส 180°`; window `4.0–20.0 ms`; แกนเวลา `0,5,10,15,20 ms` | [`b5-tran-10mv-1khz.png`](screenshots/playwright/b5-tran-10mv-1khz.png) |
+| **B6** | fill `Amplitude=20`, `Frequency=2000` → click **Run Transient** | `Vin 40.0 mV · Vout 70.0 mV · 1.75×`; window `2.0–10.0 ms`; แกนเวลาเปลี่ยนเป็น `0,2,4,6,… ms` | [`b6-tran-20mv-2khz.png`](screenshots/playwright/b6-tran-20mv-2khz.png) |
+| **B7** | fill `RE=0` → click **Run DC** | `role="alert"` → **“RE ต้องมากกว่า 0”**; ไม่มี `Simulation Results`, ไม่มี chart, ไม่มีข้อความ success | [`b7-invalid-re.png`](screenshots/playwright/b7-invalid-re.png) |
+| **B8** | `resize 1280×900` → `/simulator` → Run AC; `resize 390×844` → Run AC; `GET /` → select `emitter` | Desktop `scrollWidth 1265 / innerWidth 1280`, ปุ่ม 3 ปุ่มกว้าง 278 px, chart 1179 px; Mobile `scrollWidth 375 / innerWidth 390`, ปุ่ม 305 px, chart 305 px (`viewBox 0 0 760 300` ไม่ล้น); ฟอร์ม emitter บน mobile มี `vcc, rb, rc, re, beta, vbe` | [`b8-desktop.png`](screenshots/playwright/b8-desktop.png), [`b8-mobile-ac.png`](screenshots/playwright/b8-mobile-ac.png), [`b8-mobile-mode.png`](screenshots/playwright/b8-mobile-mode.png) |
+
+**Console / network (อ่านผ่าน MCP):**
+
+- `browser_console_messages(level=error)` หลังรันครบ = **0 error**
+  (มีเพียง `favicon.ico` 404 ตอนเปิดหน้าครั้งแรก — ไม่ใช่ error ของแอป
+  บันทึกไว้ใน `docs/screenshots/playwright/console-2026-11-24T10-15-30-744Z.log`)
+- `browser_network_requests` แสดงเฉพาะ request ไปที่ `127.0.0.1:5000`
+  (`/`, `/static/style.css`, `/simulator`, `/simulate`) — **ไม่มี CDN / JavaScript ภายนอก**
+- ภาพทุกใบใน §1.1 ถูกบันทึกด้วย `browser_take_screenshot` ของ Playwright MCP
+  โดยตรง ไม่ได้ crop หรือแต่งตัวเลข
 
 ---
 
@@ -108,7 +143,10 @@
 - **B7 แบบ engine หายจริงยังไม่ได้ตรวจใน browser** เนื่องจาก ngspice พร้อมใช้งานตลอดการทดสอบ
   เส้นทางนี้ครอบคลุมด้วย unittest (`test_engine_error_is_visible_before_any_run`,
   `test_engine_failure_shows_error_without_fake_success`) จึงไม่ได้บันทึกเป็น browser PASS
-- **Playwright MCP: NOT RUN** — ไม่มี tool ดังกล่าวใน session; ใช้ `browse` + in-app browser แทน
+- **Playwright MCP: RUN (2026-11-24)** — ตรวจ B1–B8 ครบ 8 เคสด้วย `@playwright/mcp`
+  บน Chrome ภาพและค่าที่อ่านได้อยู่ใน §1.1; ข้อจำกัดเดียวที่เหลือคือ
+  **B7 กรณี “engine หายจริง”** ยังไม่ได้จำลองใน browser (ดูข้อก่อนหน้า)
+  และ console มีเฉพาะ `favicon.ico` 404 ซึ่งไม่กระทบการทำงาน
 - ไม่มี resistor ของแหล่งสัญญาณ (source resistance = 0) และไม่มี emitter bypass cap
   ตามขอบเขตที่กำหนด
 
@@ -121,6 +159,13 @@
 .\setup.cmd        # ติดตั้ง venv + ngspice บนเครื่องใหม่ (Bypass ExecutionPolicy)
 .\run.cmd          # รันเซิร์ฟเวอร์
 ```
+
+Playwright MCP ไม่ได้รันผ่าน shell แต่เรียกผ่าน MCP tools ของ OpenCode
+(`playwright_browser_navigate`, `playwright_browser_snapshot`,
+`playwright_browser_click`, `playwright_browser_type`,
+`playwright_browser_evaluate`, `playwright_browser_take_screenshot`)
+โดย server ถูกประกาศใน `opencode.json` นอก repo — เปิด Flask ด้วย `.\run.cmd` ก่อนเสมอ
+ขั้นตอนติดตั้งทั้งหมดอยู่ที่ [`mcp-playwright.md`](mcp-playwright.md)
 
 ---
 

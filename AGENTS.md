@@ -18,8 +18,10 @@
 >   (engine หาย/ngspice fail → `role="alert"`, HTTP 200, ไม่มีผลหรือกราฟปลอมค้าง)
 > - **ชุดทดสอบปัจจุบันคือ 42 รายการ** (17 เดิม + 25 ใหม่) ต้องผ่านทั้งหมด
 > - หลักฐาน browser คือตาราง **B1–B8 ใน `docs/validation.md`** +
->   screenshot ใน `docs/screenshots/`; ใช้ `browse`/in-app browser ที่รันได้จริง
->   (Playwright MCP ไม่มีใน session นี้ → ห้ามอ้างว่าใช้ Playwright MCP)
+>   screenshot ใน `docs/screenshots/`; ใช้ browser tool ที่รันได้จริง
+>   (ตั้งแต่ 2026-11-24 มี **Playwright MCP** `@playwright/mcp` + Chrome
+>   ประกาศใน `opencode.json` นอก repo — ใช้ได้จริงและบันทึกใน §1.1
+>   ถ้า session ไหนไม่มี tool นี้ ต้องบันทึก NOT RUN ห้ามอ้างว่าใช้)
 > - ปรับ UI ได้เฉพาะไฟล์ UI/CSS; ห้ามแก้สมการหรือ parser เพื่อให้ detector ผ่าน
 > - **Commit/Push ผ่าน GitHub Desktop เท่านั้น** และต้องเป็น local clone ที่
 >   `C:\Users\advic\Projects\BJT-Amplifier-Simulator-v1` (ไม่ใช่โฟลเดอร์ OneDrive)

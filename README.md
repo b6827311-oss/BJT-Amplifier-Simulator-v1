@@ -283,7 +283,10 @@ Q1 vc vb ve QNPN
 - [Impeccable before/after](docs/impeccable-before-url.json),
   [after desktop](docs/impeccable-after-desktop.json),
   [after mobile](docs/impeccable-after-mobile.json)
-- [Screenshots](docs/screenshots/) — `before/`, `after/`, `browser/`
+- [Screenshots](docs/screenshots/) — `before/`, `after/`, `browser/`,
+  `playwright/` (B1–B8 จาก Playwright MCP, 2026-11-24)
+- [Submission — ข้อมูลส่งงาน](docs/submission.md) — checklist, rubric, คำตอบคำถามรายบุคคล
+- [Playwright MCP setup](docs/mcp-playwright.md) — วิธีติดตั้ง/เรียก tool ที่ใช้ตรวจ B1–B8
 
 ---
 
@@ -295,6 +298,10 @@ Q1 vc vb ve QNPN
 - **Lab 04 commit SHA:** `46bc3d3f27a5bcc6148f97486d77999d1a6e90e8` (`46bc3d3` —
   *feat: add Lab 04 ngspice CE amplifier simulator with B1-B8 evidence and fresh-PC setup*)
 - **วิธีรัน:** `.\setup.cmd` → `.\run.cmd` → <http://127.0.0.1:5000/simulator>
+- **Browser acceptance:** B1–B8 ตรวจด้วย **Playwright MCP** (`@playwright/mcp` + Chrome)
+  เมื่อ 2026-11-24 — ตารางค่าจริงอยู่ที่ [`docs/validation.md`](docs/validation.md) §1.1
+  ภาพอยู่ใน [`docs/screenshots/playwright/`](docs/screenshots/playwright/)
+- **ข้อมูลส่งงาน (checklist + rubric + คำตอบรายบุคคล):** [`docs/submission.md`](docs/submission.md)
 
 **AI ช่วยทำอะไร:** เขียน `spice_engine.py`/`plots.py`, route `/simulator`–`/simulate`,
 สคริปต์ติดตั้ง/พอร์ตเทเบิล, ปรับ CSS ตาม Impeccable และร่างตาราง B1–B8
